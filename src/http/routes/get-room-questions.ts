@@ -18,7 +18,7 @@ export const getRoomQuestions: FastifyPluginCallbackZod = (app) => {
       const { roomId } = request.params;
 
       const results = await db
-        .select({ questions: schema.questions.question, answer: schema.questions.answer })
+        .select({ question: schema.questions.question, answer: schema.questions.answer })
         .from(schema.questions)
         .where(eq(schema.questions.roomId, roomId))
         .orderBy(desc(schema.questions.createdAt));
