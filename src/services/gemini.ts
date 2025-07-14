@@ -1,6 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 import { env } from "../env.ts";
-import { throws } from "assert";
 
 const gemini = new GoogleGenAI({
   apiKey: env.GEMINI_API_KEY,
@@ -32,17 +31,57 @@ export async function transcribeAudio(audioAsBase64: string, mimeType: string) {
 }
 
 export async function generateEmbeddings(text: string) {
-    const response = await gemini.models.embedContent({
-        model: 'text-embedding-004',
-        contents: [{text}],
-        config: {
-            taskType: 'RETRIEVAL_DOCUMENT',
-        }
-    })
+  const response = await gemini.models.embedContent({
+    model: "text-embedding-004",
+    contents: [{ text }],
+    config: {
+      taskType: "RETRIEVAL_DOCUMENT",
+    },
+  });
 
-    if(!response.embeddings?.[0].values){
-        throw new Error ("Não foi possivel erar os embeddings")
-    }
+  if (!response.embeddings?.[0].values) {
+    throw new Error("Não foi possivel erar os embeddings");
+  }
 
-    return response.embeddings[0].values
+  return response.embeddings[0].values;
+}
+
+export async function generateAnswer(
+  question: string,
+  transcriptions: string[]
+) {
+  const context = transcriptions.join("\n\n");
+
+  const prompt = `
+    Com base no texto fornecido abaixo como contexto, responda a pergunta de forma clara e precisa em português do Brasil.
+  
+    CONTEXTO:
+    ${context}
+
+    PERGUNTA:
+    ${question}
+
+    INSTRUÇÕES:
+    - Use apenas informações contidas no contexto enviado;
+    - Se a resposta não for encontrada no contexto, apenas responda que não possui informações suficientes para responder;
+    - Seja objetivo;
+    - Mantenha um tom educativo e profissional;
+    - Cite trechos relevantes do contexto se apropriado;
+    - Se for citar o contexto, utilize o termo "conteúdo da aula:", antes da citação;
+  `.trim();
+
+  const response = await gemini.models.generateContent({
+    model,
+    contents: [
+      {
+        text: prompt,
+      },
+    ],
+  });
+
+  if (!response.text) {
+    throw new Error("erro na resposta ");
+  }
+
+  return response.text;
 }

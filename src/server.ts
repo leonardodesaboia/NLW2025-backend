@@ -35,5 +35,6 @@ app.register(createQuestionRoute)
 app.register(uploadAudioRoute)
 
 app.listen({ port: env.PORT }).then(() => {
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("HTTP server running on http://localhost:3333");
 });

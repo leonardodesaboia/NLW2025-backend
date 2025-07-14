@@ -45,3 +45,10 @@ Content-Type: application/json
 {
     "question": "pergunta teste"
 }
+
+###
+
+POST {{baseUrl}}/rooms/4ae0874a-5e8e-48cf-91f6-ed1420705ada/questions
+Content-Type: application/json
+
+{"question": "Qual é o seu nome?"}
